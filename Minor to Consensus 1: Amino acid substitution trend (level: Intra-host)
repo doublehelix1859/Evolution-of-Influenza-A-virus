@@ -1,0 +1,65 @@
+#All the R codes used is for building boxplots summarizing the changes in frequency of major and minor variants(amino acid) 
+ of influenza A/H1N1 pdm virus overtime(Day0 to Day7) sampled from Ferret study (Ted Ross'(Dept. of Infectious disease at University of 
+ Georgia) study on "Trasmission and diversity of Influenza A/H1N1pdm in Ferret")
+
+#The RNA samples were collected from nasopharyngeal swab of the ferrets infected by the virus and amplified by RT-PCR and seqeunced on
+ Illumina Miseq platform.
+ 
+
+##R Code##
+##Standard Formet of Boxplot##
+library(ggplot2)
+
+#Read Data
+filename<-'file.csv' #YOUR INPUTFILE
+mydata<-read.csv(file=filename,header=T,sep=",",na.strings = c(''))
+mydata
+str(mydata) #check the structure of inputfile characterisitcs of the variables expected
+
+#partitioning the factors to create multiple boxplots per day
+df <- data.frame(f1=factor(mydata$AminoAcid, label=c("AA_1","AA_2","AA_3")), #label the factors according to the amino acid information on the sample
+                 f2=mydata$day,
+                 f3=mydata$freq,f4=factor(mydata$challenged,label=c("Naive","Pre-immunized")), #label the sample according to sample's immunization status
+                 f5=factor(mydata$Infection,label=c("Direct","Contact"))) #label the sample according to sample's pathway of infection
+df
+#Boxplotting with the partitioned factors
+k<- ggplot(df,aes(x=factor(f2),y=f3,fill=f1))+
+  geom_boxplot() +
+  #geom_jitter()+
+  geom_jitter(aes(color = f1),size = 1, width = 0)+
+  facet_grid(.~f4*f5)+ #facet_grid can be chaged as the criteria by which the researcher want to compare and contrast
+  theme_bw()+
+  ggtitle("Segment_no(STOCK_aa)")+ #At this study title is supposed to be like this which clearly tells the position(segment_no) and initial amino acid information(STOCK_aa)
+  ylab("Frequency")+
+  xlab("Day")+
+  theme(legend.position="right") + 
+  scale_fill_discrete(name="Amino acid")
+k
+
+
+#Example#
+library(ggplot2)
+filename<-'Ferret_HA_173.csv' #YOUR INPUTFILE
+mydata<-read.csv(file=filename,header=T,sep=",",na.strings = c(''))
+mydata
+str(mydata)
+
+#partitioning the factors to create multiple boxplots per days
+df <- data.frame(f1=factor(mydata$AminoAcid, label=c("N","K","D")), 
+                 f2=mydata$day,
+                 f3=mydata$freq,f4=factor(mydata$challenged,label=c("Naive","Pre-immunized")),
+                 f5=factor(mydata$Infection,label=c("Direct","Contact")))
+df
+#Boxplotting with the partitioned factors
+k<- ggplot(df,aes(x=factor(f2),y=f3,fill=f1))+
+  geom_boxplot() +
+  #geom_jitter()+
+  geom_jitter(aes(color = f1),size = 1, width = 0)+
+  facet_grid(.~f4*f5)+
+  theme_bw()+
+  ggtitle("HA_173(STOCK-N)")+
+  ylab("Frequency")+
+  xlab("Day")+
+  theme(legend.position="right") + 
+  scale_fill_discrete(name="Amino acid")
+k
